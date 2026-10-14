@@ -1,32 +1,54 @@
 # Same lightness?
 
-Final project for Programming Interactivity, topic 7 · colour, perception.
+**Two colours with the same HSL lightness don't look equally light. Can you tell which one is lighter?**
 
-> Two colours with the same HSL lightness don't look equally light. Why?
+### [▶ Play it: maydamv.github.io/same-lightness](https://maydamv.github.io/same-lightness/)
 
-`hsl(60 100% 50%)` (yellow) and `hsl(240 100% 50%)` (blue) have the same
-lightness, 50%. But yellow sends almost 13 times more light to your eye than
-blue. HSL's lightness is only the middle point between the strongest and the
-weakest RGB channel; it doesn't know that our eyes are much more sensitive to
-green than to blue.
+[![Yellow and blue, both hsl(… 100% 50%). After you click, the grey under each shows the real light: 0.93 and 0.07.](docs/game.jpg)](https://maydamv.github.io/same-lightness/)
 
-## What the page shows
+Yellow and blue, both `hsl(… 100% 50%)`. CSS says they're equally light.
+Your eyes say otherwise, and your eyes are right: yellow sends **12.9 times
+more light** than blue.
 
-1. **Same L, different light** · 12 hues with the same HSL lightness, and 12
-   with the same OKLCH lightness. Under each colour, a grey with the same
-   luminance. The HSL greys go from almost white to almost black; the OKLCH
-   greys are all the same.
-2. **Under the hood** · click any colour to see the luminance formula step by
-   step: screen value → real light (gamma undone) → × the eye's weight → sum.
-3. **Can you read it?** · a WCAG contrast checker. White on HSL yellow is
-   1.07 : 1, white on HSL blue is 8.59 : 1: same lightness, opposite results.
-4. **Not everyone sees the same colours** · repaints the whole page as someone
-   with protanopia, deuteranopia, tritanopia or achromatopsia would see it.
+## What's on the page
 
-## Run it
+| | |
+|---|---|
+| **The game** | Five pairs of colours with the same HSL lightness. Pick the lighter one, then watch the grey that shows how much light each really sends. |
+| **Same L, different light** | 12 hues at the same HSL lightness next to 12 at the same OKLCH lightness. The HSL greys go from almost white to almost black; the OKLCH greys are all the same. |
+| **Under the hood** | Click any colour to see the luminance formula worked out step by step. |
+| **Can you read it?** | A WCAG contrast checker. White text on HSL yellow: 1.07 : 1. On HSL blue: 8.59 : 1. Same lightness. |
+| **Not everyone sees the same colours** | Repaints the whole page as someone with protanopia, deuteranopia, tritanopia or no colour vision would see it. |
 
-No build, no dependencies. Serve the folder (ES modules don't load from
-`file://`):
+![The two rows: HSL greys jump from 0.07 to 0.93, OKLCH greys stay between 0.32 and 0.37](docs/rows.jpg)
+
+## Why it happens
+
+HSL's lightness is the middle point between the strongest and the weakest
+RGB channel. For every fully saturated hue that's 50%, whatever the hue.
+
+Our eyes don't work like that. We are far more sensitive to green than to
+red, and much more than to blue. **Relative luminance** (the formula WCAG
+uses) weights each channel by that sensitivity, after undoing the screen's
+gamma curve:
+
+```
+L = 0.2126 × R + 0.7152 × G + 0.0722 × B
+```
+
+| | R | G | B | HSL lightness | Luminance |
+|---|---|---|---|---|---|
+| `hsl(60 100% 50%)` yellow | 1 | 1 | 0 | 50% | 0.2126 + 0.7152 = **0.93** |
+| `hsl(240 100% 50%)` blue | 0 | 0 | 1 | 50% | **0.07** |
+
+**OKLCH** is a colour space designed so that the same `L` looks equally light
+for every hue. That's why its row of greys is flat, and why it's a better
+choice for palettes and design tokens.
+
+## Run it locally
+
+No build, no dependencies. ES modules need a server, so don't open the file
+directly:
 
 ```sh
 npx live-server
@@ -34,21 +56,23 @@ npx live-server
 python -m http.server
 ```
 
-## Files
+## The code
 
 ```
-index.html     the four sections
-css/style.css  the styles
+index.html     the game and the four sections
+css/style.css  a neutral grey page, so it doesn't tint what you see
 js/colour.js   the maths: HSL, OKLCH, luminance, contrast, colour blindness
-js/main.js     the state, drawing each section, and the events
+js/main.js     the state, one draw function per section, and the events
 ```
 
-## The formulas
+Every colour goes on screen through one function, `paint()`, which is how the
+colour-blindness switch can repaint the whole page.
 
-- **HSL → RGB**: CSS Color Module Level 4.
-- **Relative luminance and contrast ratio**: WCAG 2.2,
-  `L = 0.2126 R + 0.7152 G + 0.0722 B` on linear (gamma-undone) channels,
-  `contrast = (L1 + 0.05) / (L2 + 0.05)`.
-- **OKLCH → RGB**: Björn Ottosson, [A perceptual color space for image processing](https://bottosson.github.io/posts/oklab/).
-- **Colour blindness**: Machado, Oliveira & Fernandes (2009), *A Physiologically-based
-  Model for Simulation of Color Vision Deficiency*, severity 1.0.
+## Sources
+
+- HSL → RGB: [CSS Color Module Level 4](https://www.w3.org/TR/css-color-4/#hsl-to-rgb)
+- Relative luminance and contrast ratio: [WCAG 2.2](https://www.w3.org/TR/WCAG22/#dfn-relative-luminance)
+- OKLCH → RGB: Björn Ottosson, [A perceptual color space for image processing](https://bottosson.github.io/posts/oklab/)
+- Colour blindness: Machado, Oliveira & Fernandes (2009), *A Physiologically-based Model for Simulation of Color Vision Deficiency*
+
+Made as the final project for Programming Interactivity.
