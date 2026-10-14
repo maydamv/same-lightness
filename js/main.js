@@ -1,4 +1,4 @@
-import { hslToRgb, oklchToRgb, luminance, asGrey, rgbToHex, toLinear, WEIGHTS, contrast, hexToRgb } from "./colour.js";
+import { hslToRgb, oklchToRgb, luminance, asGrey, rgbToHex, toLinear, WEIGHTS, contrast, hexToRgb, simulate } from "./colour.js";
 
 // 12 hues around the colour wheel, one every 30°
 const HUES = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
@@ -10,6 +10,7 @@ const state = {
   picked: { model: "hsl", hue: 240 }, // the colour shown in "Under the hood"
   text: "#ffffff", // the contrast checker
   bg: "#ffff00",
+  vision: "normal", // how the page is painted (section 4)
 };
 
 // WCAG's minimum ratios
@@ -20,6 +21,12 @@ const LEVELS = [
 ];
 
 const $ = (selector) => document.querySelector(selector);
+
+// Every colour goes on screen through here, so the vision simulator
+// changes all of them. The maths always uses the real colour.
+function paint(rgb) {
+  return rgbToHex(simulate(rgb, state.vision));
+}
 
 // The colour of one swatch, from the row it's in and its hue
 function colourOf(model, hue) {
@@ -36,8 +43,8 @@ function swatch(model, hue) {
       <span class="grey"></span>
       <small></small>
     </button>`;
-  li.querySelector(".colour").style.background = rgbToHex(rgb);
-  li.querySelector(".grey").style.background = rgbToHex(asGrey(rgb));
+  li.querySelector(".colour").style.background = paint(rgb);
+  li.querySelector(".grey").style.background = paint(asGrey(rgb));
   li.querySelector("small").textContent = luminance(rgb).toFixed(2);
   li.querySelector("button").addEventListener("click", () => {
     state.picked = { model, hue };
@@ -72,7 +79,7 @@ function drawHood() {
   const linear = rgb.map(toLinear);
   const light = linear.map((c, i) => c * WEIGHTS[i]);
 
-  $("#hood-chip").style.background = rgbToHex(rgb);
+  $("#hood-chip").style.background = paint(rgb);
   $("#hood-name").textContent = model === "hsl"
     ? `hsl(${hue} 100% ${state.hslL}%) = ${rgbToHex(rgb)}`
     : `oklch(${state.okL}% ${OK_CHROMA} ${hue}) = ${rgbToHex(rgb)}`;
@@ -106,8 +113,8 @@ function drawContrast() {
 
   $("#text-colour").value = state.text;
   $("#bg-colour").value = state.bg;
-  $("#preview").style.color = state.text;
-  $("#preview").style.background = state.bg;
+  $("#preview").style.color = paint(hexToRgb(state.text));
+  $("#preview").style.background = paint(hexToRgb(state.bg));
   $("#ratio").textContent = `${ratio.toFixed(2)} : 1`;
 
   $("#checks").replaceChildren(...LEVELS.map((level) => {
@@ -142,6 +149,12 @@ $("#text-colour").addEventListener("input", (event) => {
 
 $("#bg-colour").addEventListener("input", (event) => {
   state.bg = event.target.value;
+  render();
+});
+
+// one listener for all the radio buttons: "change" bubbles up to the fieldset
+$(".visions").addEventListener("change", (event) => {
+  state.vision = event.target.value;
   render();
 });
 

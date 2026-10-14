@@ -122,3 +122,26 @@ code { font: 0.9em ui-monospace, Consolas, monospace; }
 .checks li { padding: 0.25rem 0.7rem; border-radius: 99px; font-size: 0.9rem; font-weight: 600; }
 .checks .pass { background: #d9f2e3; color: #18603a; }
 .checks .fail { background: #fbe1df; color: #9b2c22; }
+
+/* ---------- 4 · vision ---------- */
+.visions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  border: 0;
+  padding: 0;
+  margin: 1rem 0 0;
+}
+.visions legend { font-weight: 700; margin-bottom: 0.5rem; }
+.visions label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  cursor: pointer;
+}
+.visions label:has(input:checked) { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.visions label:has(input:focus-visible) { outline: 3px solid #2f6fde; outline-offset: 2px; }
+.visions small { opacity: 0.7; }

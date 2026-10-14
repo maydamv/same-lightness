@@ -67,6 +67,37 @@ export function oklchToRgb(l, c, h) {
   return [r, g, bl].map((v) => clamp(fromLinear(v)));
 }
 
+// How a colour looks to someone with a missing kind of cone.
+// Each matrix mixes the three linear channels into new ones.
+// Matrices from Machado, Oliveira & Fernandes (2009), severity 1.0.
+const VISION = {
+  protanopia: [ // no red cones
+    [0.152286, 1.052583, -0.204868],
+    [0.114503, 0.786281, 0.099216],
+    [-0.003882, -0.048116, 1.051998],
+  ],
+  deuteranopia: [ // no green cones, the most common one
+    [0.367322, 0.860646, -0.227968],
+    [0.280085, 0.672501, 0.047413],
+    [-0.01182, 0.04294, 0.968881],
+  ],
+  tritanopia: [ // no blue cones
+    [1.255528, -0.076749, -0.178779],
+    [-0.078411, 0.930809, 0.147602],
+    [0.004733, 0.691367, 0.3039],
+  ],
+};
+
+export function simulate(rgb, vision) {
+  if (vision === "normal") return rgb;
+  if (vision === "achromatopsia") return asGrey(rgb); // no colour at all: only light is left
+  const linear = rgb.map(toLinear);
+  return VISION[vision].map((row) => {
+    const mixed = row[0] * linear[0] + row[1] * linear[1] + row[2] * linear[2];
+    return clamp(fromLinear(clamp(mixed)));
+  });
+}
+
 // "#ff8800" → [1, 0.53, 0]
 export function hexToRgb(hex) {
   return [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
