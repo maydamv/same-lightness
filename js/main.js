@@ -1,4 +1,4 @@
-import { hslToRgb, oklchToRgb, luminance, asGrey, rgbToHex } from "./colour.js";
+import { hslToRgb, oklchToRgb, luminance, asGrey, rgbToHex, toLinear, WEIGHTS } from "./colour.js";
 
 // 12 hues around the colour wheel, one every 30°
 const HUES = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
@@ -56,8 +56,45 @@ function drawRows() {
   $("#ok-spread").textContent = spread("oklch");
 }
 
+// The luminance formula, one step per row of the table
+function drawHood() {
+  const { model, hue } = state.picked;
+  const rgb = colourOf(model, hue);
+  const linear = rgb.map(toLinear);
+  const light = linear.map((c, i) => c * WEIGHTS[i]);
+
+  $("#hood-chip").style.background = rgbToHex(rgb);
+  $("#hood-name").textContent = model === "hsl"
+    ? `hsl(${hue} 100% ${state.hslL}%) = ${rgbToHex(rgb)}`
+    : `oklch(${state.okL}% ${OK_CHROMA} ${hue}) = ${rgbToHex(rgb)}`;
+
+  const steps = [
+    ["Screen value, 0–255", rgb.map((c) => Math.round(c * 255))],
+    ["Real light, gamma undone", linear.map((c) => c.toFixed(3))],
+    ["× how sensitive the eye is", WEIGHTS],
+    ["= light it adds", light.map((c) => c.toFixed(3))],
+  ];
+  $("#hood-body").replaceChildren(...steps.map(([label, values]) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<th></th><td></td><td></td><td></td>`;
+    tr.querySelector("th").textContent = label;
+    values.forEach((value, i) => (tr.querySelectorAll("td")[i].textContent = value));
+    return tr;
+  }));
+
+  // the bar is 100% wide for white: each channel fills its share of the light
+  $("#bar-r").style.width = `${light[0] * 100}%`;
+  $("#bar-g").style.width = `${light[1] * 100}%`;
+  $("#bar-b").style.width = `${light[2] * 100}%`;
+
+  const total = luminance(rgb);
+  $("#hood-result").textContent = `Luminance = ${light.map((c) => c.toFixed(3)).join(" + ")} = ${total.toFixed(3)}, `
+    + `${Math.round(total * 100)}% of the light of white.`;
+}
+
 function render() {
   drawRows();
+  drawHood();
 }
 
 $("#hsl-l").addEventListener("input", (event) => {

@@ -37,6 +37,26 @@
 
     <section id="hood">
       <h2>2 · Under the hood</h2>
+      <p>HSL's lightness is only the middle point between the strongest and the weakest channel. It doesn't know that our eyes are much more sensitive to green than to blue. Relative luminance does.</p>
+
+      <div class="picked">
+        <span class="chip" id="hood-chip"></span>
+        <code id="hood-name"></code>
+      </div>
+
+      <div class="scroll">
+        <table class="maths">
+          <thead>
+            <tr><th></th><th>Red</th><th>Green</th><th>Blue</th></tr>
+          </thead>
+          <tbody id="hood-body"></tbody>
+        </table>
+      </div>
+
+      <div class="stack" aria-hidden="true">
+        <span class="r" id="bar-r"></span><span class="g" id="bar-g"></span><span class="b" id="bar-b"></span>
+      </div>
+      <p id="hood-result"></p>
     </section>
 
     <section id="contrast">

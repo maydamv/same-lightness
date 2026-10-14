@@ -76,3 +76,25 @@ code { font: 0.9em ui-monospace, Consolas, monospace; }
 @media (max-width: 40rem) {
   .swatches { grid-template-columns: repeat(6, 1fr); }
 }
+
+/* ---------- 2 · under the hood ---------- */
+.picked { display: flex; align-items: center; gap: 0.75rem; margin: 1rem 0; }
+.chip { width: 2.5rem; height: 2.5rem; border-radius: 8px; border: 1px solid var(--line); }
+
+.scroll { overflow-x: auto; }
+.maths { border-collapse: collapse; width: 100%; min-width: 30rem; font: 0.9rem ui-monospace, Consolas, monospace; }
+.maths th, .maths td { padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--line); text-align: right; }
+.maths tbody th { text-align: left; font-family: system-ui, sans-serif; font-weight: 400; color: var(--muted); }
+.maths tbody tr:last-child { font-weight: 700; }
+
+.stack {
+  display: flex;
+  height: 1.25rem;
+  margin-top: 1rem;
+  background: #eee;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.stack .r { background: #e5484d; }
+.stack .g { background: #30a46c; }
+.stack .b { background: #3e63dd; }
