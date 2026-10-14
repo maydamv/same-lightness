@@ -87,6 +87,42 @@
       <p id="hood-result"></p>
     </section>
 
+    <section id="match">
+      <h2>Match the grey</h2>
+      <p>Your turn. Move the slider until the colour sends as much light as the grey. The slider is HSL lightness, so don't trust the number: trust your eyes.</p>
+
+      <div class="match" id="match-box">
+        <div class="pair">
+          <figure class="card-chip">
+            <span class="paint" id="match-grey"></span>
+            <figcaption>The grey</figcaption>
+          </figure>
+          <figure class="card-chip">
+            <span class="paint" id="match-colour"></span><span class="truth" id="match-truth"></span>
+            <figcaption id="match-name"></figcaption>
+          </figure>
+        </div>
+
+        <label class="match-slider" for="match-l">Lightness <input id="match-l" type="range" min="0" max="100" value="50"></label>
+
+        <div class="actions">
+          <button type="button" class="next" id="match-check">Check</button>
+          <button type="button" class="next" id="match-next" hidden>Next colour</button>
+        </div>
+        <p class="match-result" id="match-result" aria-live="polite"></p>
+
+        <div id="match-summary" hidden>
+          <div class="scroll">
+            <table class="maths">
+              <thead><tr><th>Colour</th><th>Your L</th><th>L it needed</th><th>Points</th></tr></thead>
+              <tbody id="match-rows"></tbody>
+            </table>
+          </div>
+          <p class="check" id="match-total"></p>
+        </div>
+      </div>
+    </section>
+
     <section id="oklch">
       <h2>And OKLCH?</h2>
       <p>OKLCH is calculated in a different way: it starts from a model of the eye, so its L is the lightness you perceive.</p>

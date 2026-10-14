@@ -237,6 +237,30 @@ p { max-width: 62ch; }
 .stack .g { background: #30a46c; }
 .stack .b { background: #3e63dd; }
 
+/* match the grey */
+.match { display: grid; gap: 1.25rem; margin-top: 1.5rem; }
+.match .pair { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1rem, 4vw, 2.5rem); max-width: 34rem; }
+.card-chip {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0.5rem 0.5rem 0.75rem;
+  border-radius: 3px;
+  background: var(--chip);
+  box-shadow: var(--shadow);
+}
+.card-chip .paint, .card-chip .truth { grid-row: 1; grid-column: 1; }
+.card-chip .paint { aspect-ratio: 4 / 3; }
+/* the same reveal as the first game: the colour's grey rises from the bottom */
+.card-chip .truth { align-self: end; height: 0; transition: height 0.6s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.match.checked .card-chip .truth { height: 50%; }
+.card-chip figcaption { font-weight: 600; padding-inline: 0.15rem; }
+
+.match-slider { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; max-width: 34rem; font-weight: 600; }
+.match-slider input { flex: 1; min-width: 10rem; accent-color: var(--ink); }
+.match .actions { justify-content: flex-start; }
+.match-result { font-size: 1.1rem; }
+
 /* and OKLCH? */
 h3 { margin: 2rem 0 0.5rem; font-size: 1.2rem; font-weight: 600; }
 .steps, .reasons { max-width: 62ch; padding-left: 1.4rem; }
@@ -293,5 +317,5 @@ footer {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tile, .tile .truth, .swatches button { transition: none; }
+  .tile, .tile .truth, .swatches button, .card-chip .truth { transition: none; }
 }

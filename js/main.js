@@ -1,4 +1,4 @@
-import { hslToRgb, oklchToRgb, inGamut, luminance, asGrey, rgbToHex, toLinear, WEIGHTS, contrast, hexToRgb, simulate } from "./colour.js";
+import { hslToRgb, oklchToRgb, inGamut, luminance, asGrey, rgbToHex, toLinear, fromLinear, WEIGHTS, contrast, hexToRgb, simulate } from "./colour.js";
 
 // 12 hues around the colour wheel, one every 30°
 const HUES = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
@@ -13,7 +13,13 @@ const PAIRS = [
   [210, 300], // azure vs magenta
 ];
 
+// "Match the grey": four hues, always against the same grey
+const MATCH_HUES = [240, 60, 120, 300];
+const HUE_NAMES = { 60: "Yellow", 120: "Green", 240: "Blue", 300: "Magenta" };
+const TARGET = 0.2; // the grey's luminance: 20% of the light of white
+
 const state = {
+  match: { round: 0, l: 50, checked: false, results: [] }, // l: the slider, in %
   game: { round: 0, guess: null, score: 0 }, // guess: 0 or 1, the tile clicked
   unlocked: false, // the explanation shows once the game is finished or skipped
   hslL: 60,  // HSL lightness, in %
@@ -94,6 +100,59 @@ function openExplanation() {
   render();
   // focus scrolls to the heading, and keyboard and screen readers start reading there
   $("#rows h2").focus();
+}
+
+// The light of hsl(hue 100% l%)
+function lightAt(hue, l) {
+  return luminance(hslToRgb(hue, 1, l / 100));
+}
+
+// The HSL lightness that sends the same light as the grey: try every L, keep the closest
+function neededL(hue) {
+  let best = 0;
+  for (let l = 0; l <= 100; l++) {
+    if (Math.abs(lightAt(hue, l) - TARGET) < Math.abs(lightAt(hue, best) - TARGET)) best = l;
+  }
+  return best;
+}
+
+function drawMatch() {
+  const { round, l, checked, results } = state.match;
+  const finished = round === MATCH_HUES.length;
+  const hue = MATCH_HUES[finished ? MATCH_HUES.length - 1 : round];
+  const colour = hslToRgb(hue, 1, l / 100);
+  const g = fromLinear(TARGET);
+
+  $("#match-grey").style.background = paint([g, g, g]);
+  $("#match-colour").style.background = paint(colour);
+  $("#match-truth").style.background = paint(asGrey(colour));
+  $("#match-name").textContent = `hsl(${hue} 100% ${l}%)`;
+  $("#match-l").value = l;
+  $("#match-l").disabled = checked || finished;
+  $("#match-box").classList.toggle("checked", checked || finished); // shows the colour's own grey
+
+  $("#match-check").hidden = checked || finished;
+  $("#match-next").hidden = !checked && !finished;
+  $("#match-next").textContent = finished ? "Play again" : round === MATCH_HUES.length - 1 ? "See the results" : "Next colour";
+
+  const last = results.at(-1);
+  $("#match-result").textContent = checked && !finished
+    ? `${last.points} points. You chose L ${last.l}%; it needed L ${last.needed}%. The grey half shows your colour's real light.`
+    : finished ? "" : `${HUE_NAMES[hue]} ${round + 1} of ${MATCH_HUES.length}: make it as light as the grey.`;
+
+  $("#match-summary").hidden = !finished;
+  if (finished) {
+    $("#match-rows").replaceChildren(...results.map((r) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<th></th><td></td><td></td><td></td>`;
+      [HUE_NAMES[r.hue], `${r.l}%`, `${r.needed}%`, r.points].forEach((value, i) => (tr.children[i].textContent = value));
+      return tr;
+    }));
+    const total = results.reduce((sum, r) => sum + r.points, 0);
+    const needs = results.map((r) => r.needed);
+    $("#match-total").textContent = `${total} of ${results.length * 100} points. The same grey needed L from `
+      + `${Math.min(...needs)}% to ${Math.max(...needs)}%: same light, very different HSL lightness.`;
+  }
 }
 
 // The OKLCH row's chroma: the most colourful one at which all 12 hues still fit
@@ -225,6 +284,7 @@ function render() {
   drawGame();
   drawRows();
   drawHood();
+  drawMatch();
   drawOklch();
   drawContrast();
 }
@@ -248,6 +308,33 @@ $("#next").addEventListener("click", () => {
     game.round += 1;
     game.guess = null;
     if (game.round === PAIRS.length) state.unlocked = true; // finished: the explanation is earned
+  }
+  render();
+});
+
+$("#match-l").addEventListener("input", (event) => {
+  state.match.l = Number(event.target.value);
+  render();
+});
+
+$("#match-check").addEventListener("click", () => {
+  const match = state.match;
+  const hue = MATCH_HUES[match.round];
+  const needed = neededL(hue);
+  const points = Math.max(0, 100 - 4 * Math.abs(match.l - needed)); // 4 points off per L% away
+  match.results.push({ hue, l: match.l, needed, points });
+  match.checked = true;
+  render();
+});
+
+$("#match-next").addEventListener("click", () => {
+  const match = state.match;
+  if (match.round === MATCH_HUES.length) {
+    state.match = { round: 0, l: 50, checked: false, results: [] }; // play again
+  } else {
+    match.round += 1;
+    match.l = 50;
+    match.checked = false;
   }
   render();
 });

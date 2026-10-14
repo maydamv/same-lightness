@@ -17,6 +17,7 @@ more light** than blue.
 | **The game** | Five pairs of colours with the same HSL lightness. Pick the lighter one, then watch the grey that shows how much light each really sends. The explanation opens when you finish (or skip) the game. |
 | **Same L, different light** | 12 hues at the same HSL lightness next to 12 at the same OKLCH lightness. The HSL greys go from almost white to almost black; the OKLCH greys are all the same. |
 | **Under the hood** | Click any colour to see the luminance formula worked out step by step. |
+| **Match the grey** | Move an HSL lightness slider until a colour sends as much light as a grey. The same grey needs L = 70% in blue and only 25% in yellow. |
 | **And OKLCH?** | How OKLCH is calculated, a live check against the OKLCH row, and why designers are moving to it. |
 | **Can you read it?** | A WCAG contrast checker. White text on HSL yellow: 1.07 : 1. On HSL blue: 8.59 : 1. Same lightness. |
 | **Not everyone sees the same colours** | Repaints the whole page as someone with protanopia, deuteranopia, tritanopia or no colour vision would see it. |
