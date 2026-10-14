@@ -1,12 +1,16 @@
 /* A neutral grey page, like the viewing booths designers use to judge colour:
-   no tint, so the page doesn't change what you see in the swatches. */
+   almost no tint, so the page doesn't change what you see in the swatches.
+   The colours sit on white cards, like the chips of a printed swatch book. */
 :root {
-  --booth: #d2d2d2;  /* the page */
-  --card: #e6e6e6;   /* a step lighter, for controls */
+  --booth: #d4d5d8;  /* the page */
+  --card: #e8e9eb;   /* a step lighter, for controls */
+  --chip: #fff;      /* the paper of a swatch */
   --ink: #000;
-  --muted: #474747;  /* 6.1 : 1 on the booth grey */
-  --line: #a9a9a9;
+  --muted: #45474c;  /* 6 : 1 on the booth grey */
+  --line: #a7a9ae;
   --focus: #000;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.14), 0 12px 24px -14px rgb(0 0 0 / 0.45);
+  --display: "Archivo", system-ui, sans-serif; /* set wide and heavy for headings */
 }
 
 * { box-sizing: border-box; }
@@ -15,8 +19,13 @@ body {
   margin: 0;
   background: var(--booth);
   color: var(--ink);
-  font: 400 1.0625rem/1.55 "Instrument Sans", system-ui, sans-serif;
+  font: 400 1.0625rem/1.55 "Archivo", system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
+}
+
+h1, h2, h3, .next {
+  font-family: var(--display);
+  font-stretch: 125%; /* the wide cut of Archivo */
 }
 
 code { font-family: inherit; font-weight: 600; }
@@ -38,37 +47,46 @@ button { font: inherit; color: inherit; }
 
 .game h1 {
   margin: 0;
-  max-width: 18ch;
-  font-size: clamp(2.2rem, 6vw, 4.2rem);
-  font-weight: 600;
-  line-height: 1.05;
-  letter-spacing: -0.025em;
+  max-width: 16ch;
+  font-size: clamp(2.3rem, 7vw, 5rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
 }
 
 .tiles {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(0.75rem, 3vw, 2rem);
-  width: min(100%, 52rem);
+  gap: clamp(1rem, 4vw, 3rem);
+  width: min(100%, 50rem);
+  padding: 0.5rem;
 }
 
+/* each tile is a swatch chip: the colour on top, a printed label below */
 .tile {
-  position: relative;
   display: grid;
   grid-template-rows: 1fr auto;
-  gap: 0.6rem;
-  padding: 0;
+  gap: 0.75rem;
+  padding: 0.6rem 0.6rem 0.9rem;
   border: 0;
-  background: none;
+  border-radius: 3px;
+  background: var(--chip);
+  box-shadow: var(--shadow);
+  text-align: left;
   cursor: pointer;
+  transition: transform 0.25s ease;
 }
+/* laid down a little crooked, like two chips dropped on a desk */
+.tile:first-child { transform: rotate(-1.5deg); }
+.tile:last-child { transform: rotate(1.5deg); }
+.tile:not(:disabled):hover { transform: rotate(0deg) translateY(-6px); }
 .tile:disabled { cursor: default; }
 
 .tile .paint, .tile .truth {
   grid-row: 1;
   grid-column: 1;
   aspect-ratio: 1;
-  border-radius: 4px;
 }
 
 /* the grey rises from the bottom and covers half of the colour */
@@ -76,13 +94,12 @@ button { font: inherit; color: inherit; }
   align-self: end;
   aspect-ratio: auto;
   height: 0;
-  border-radius: 0 0 4px 4px;
   transition: height 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 .revealed .tile .truth { height: 50%; }
 
-.tile-name { font-size: 0.95rem; }
-.tile[aria-pressed="true"] .paint { box-shadow: 0 0 0 4px var(--ink); }
+.tile-name { font-size: clamp(0.8rem, 2vw, 1rem); padding-inline: 0.2rem; }
+.tile[aria-pressed="true"] { outline: 4px solid var(--ink); outline-offset: 4px; }
 
 .verdict {
   display: grid;
@@ -145,11 +162,12 @@ section {
 }
 
 h2 {
-  margin: 0 0 0.75rem;
-  font-size: clamp(1.6rem, 3.5vw, 2.3rem);
-  font-weight: 600;
-  line-height: 1.1;
-  letter-spacing: -0.015em;
+  margin: 0 0 1rem;
+  font-size: clamp(1.7rem, 4.5vw, 2.9rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
 }
 p { max-width: 62ch; }
 .hint, .spread { color: var(--muted); font-size: 0.95rem; }
@@ -171,25 +189,28 @@ p { max-width: 62ch; }
 .swatches {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  gap: 4px;
+  gap: 6px;
   list-style: none;
-  margin: 0.75rem 0 0;
+  margin: 0.9rem 0 0;
   padding: 0;
 }
+/* small swatch chips: colour, its grey, and the light printed underneath */
 .swatches button {
   display: grid;
   width: 100%;
-  padding: 0;
+  padding: 3px 3px 5px;
   border: 0;
-  background: none;
+  border-radius: 2px;
+  background: var(--chip);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
   cursor: pointer;
+  transition: transform 0.15s ease;
 }
+.swatches button:hover { transform: translateY(-3px); }
 .swatches .colour, .swatches .grey { height: 3.75rem; }
-.swatches .colour { border-radius: 3px 3px 0 0; }
-.swatches .grey { border-radius: 0 0 3px 3px; }
-.swatches small { font-size: 0.78rem; color: var(--muted); padding-top: 3px; }
+.swatches small { font-size: 0.75rem; color: var(--muted); padding-top: 4px; }
+.swatches button[aria-pressed="true"] { outline: 3px solid var(--ink); outline-offset: 2px; }
 .swatches button[aria-pressed="true"] small { color: var(--ink); font-weight: 700; }
-.swatches button[aria-pressed="true"] .colour { box-shadow: inset 0 0 0 3px var(--ink); }
 
 @media (max-width: 40rem) {
   .swatches { grid-template-columns: repeat(6, 1fr); }
@@ -197,7 +218,7 @@ p { max-width: 62ch; }
 
 /* under the hood */
 .picked { display: flex; align-items: center; gap: 0.75rem; margin: 1.5rem 0 1rem; }
-.chip { width: 2.75rem; height: 2.75rem; border-radius: 3px; }
+.chip { width: 3.25rem; height: 3.25rem; border: 4px solid var(--chip); border-radius: 3px; box-shadow: var(--shadow); }
 
 .scroll { overflow-x: auto; }
 .maths { border-collapse: collapse; width: 100%; min-width: 30rem; }
@@ -235,7 +256,7 @@ h3 { margin: 2rem 0 0.5rem; font-size: 1.2rem; font-weight: 600; }
   cursor: pointer;
 }
 
-.preview { padding: 1.25rem 1.5rem; border-radius: 4px; }
+.preview { padding: 1.5rem 1.75rem; border-radius: 3px; box-shadow: var(--shadow); }
 .preview p { margin: 0.25rem 0; }
 .preview .big { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 700; line-height: 1.1; }
 
@@ -272,5 +293,5 @@ footer {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tile .truth { transition: none; }
+  .tile, .tile .truth, .swatches button { transition: none; }
 }
