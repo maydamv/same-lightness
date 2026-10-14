@@ -4,7 +4,18 @@ import { hslToRgb, oklchToRgb, luminance, asGrey, rgbToHex, toLinear, WEIGHTS, c
 const HUES = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
 const OK_CHROMA = 0.12; // low enough that every hue fits on a screen
 
+// The game: pairs of hues, all hsl(h 100% 50%). They get harder as the
+// difference in light gets smaller.
+const PAIRS = [
+  [60, 240],  // yellow vs blue
+  [0, 120],   // red vs green
+  [180, 300], // cyan vs magenta
+  [270, 30],  // violet vs orange
+  [210, 300], // azure vs magenta
+];
+
 const state = {
+  game: { round: 0, guess: null, score: 0 }, // guess: 0 or 1, the tile clicked
   hslL: 50,  // HSL lightness, in %
   okL: 70,   // OKLCH lightness, in %
   picked: { model: "hsl", hue: 240 }, // the colour shown in "Under the hood"
@@ -26,6 +37,48 @@ const $ = (selector) => document.querySelector(selector);
 // changes all of them. The maths always uses the real colour.
 function paint(rgb) {
   return rgbToHex(simulate(rgb, state.vision));
+}
+
+function drawGame() {
+  const { round, guess, score } = state.game;
+  const finished = round === PAIRS.length;
+  const header = $(".game");
+
+  // after the last pair, the tiles show the first one again, revealed
+  const hues = PAIRS[finished ? 0 : round];
+  const colours = hues.map((hue) => hslToRgb(hue, 1, 0.5));
+  const lights = colours.map(luminance);
+  const lighter = lights[0] > lights[1] ? 0 : 1;
+
+  ["#tile-a", "#tile-b"].forEach((id, i) => {
+    const tile = $(id);
+    tile.querySelector(".paint").style.background = paint(colours[i]);
+    tile.querySelector(".truth").style.background = paint(asGrey(colours[i]));
+    tile.querySelector(".tile-name").textContent = guess === null
+      ? `hsl(${hues[i]} 100% 50%)`
+      : `hsl(${hues[i]} 100% 50%), light ${lights[i].toFixed(2)}`;
+    tile.disabled = guess !== null || finished;
+    tile.setAttribute("aria-pressed", String(guess === i));
+  });
+
+  // the grey half slides in once there's a guess
+  header.classList.toggle("revealed", guess !== null || finished);
+
+  if (finished) {
+    $("#question").textContent = `Your eyes saw ${score} of ${PAIRS.length} differences. HSL saw none.`;
+    $("#verdict").textContent = "Every pair had the same HSL lightness, 50%. Scroll down to see why.";
+    $("#next").textContent = "Play again";
+  } else if (guess === null) {
+    $("#question").textContent = "Which one is lighter?";
+    $("#verdict").textContent = "Both have the same lightness in HSL: 50%. Trust your eyes and click one.";
+  } else {
+    const times = Math.max(...lights) / Math.min(...lights);
+    $("#verdict").textContent = `${guess === lighter ? "Right" : "Not this time"}: the grey shows the real light. `
+      + `One sends ${times.toFixed(1)}× more light than the other, and HSL calls them equal.`;
+    $("#next").textContent = round === PAIRS.length - 1 ? "See my score" : "Next pair";
+  }
+  $("#next").hidden = guess === null && !finished;
+  $("#round").textContent = finished ? "" : `Pair ${round + 1} of ${PAIRS.length}`;
 }
 
 // The colour of one swatch, from the row it's in and its hue
@@ -127,10 +180,33 @@ function drawContrast() {
 }
 
 function render() {
+  drawGame();
   drawRows();
   drawHood();
   drawContrast();
 }
+
+["#tile-a", "#tile-b"].forEach((id, i) => {
+  $(id).addEventListener("click", () => {
+    const hues = PAIRS[state.game.round];
+    const lights = hues.map((hue) => luminance(hslToRgb(hue, 1, 0.5)));
+    const lighter = lights[0] > lights[1] ? 0 : 1;
+    state.game.guess = i;
+    if (i === lighter) state.game.score += 1;
+    render();
+  });
+});
+
+$("#next").addEventListener("click", () => {
+  const game = state.game;
+  if (game.round === PAIRS.length) {
+    state.game = { round: 0, guess: null, score: 0 }; // play again
+  } else {
+    game.round += 1;
+    game.guess = null;
+  }
+  render();
+});
 
 $("#hsl-l").addEventListener("input", (event) => {
   state.hslL = Number(event.target.value);
