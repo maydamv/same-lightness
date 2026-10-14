@@ -17,6 +17,7 @@ more light** than blue.
 | **The game** | Five pairs of colours with the same HSL lightness. Pick the lighter one, then watch the grey that shows how much light each really sends. |
 | **Same L, different light** | 12 hues at the same HSL lightness next to 12 at the same OKLCH lightness. The HSL greys go from almost white to almost black; the OKLCH greys are all the same. |
 | **Under the hood** | Click any colour to see the luminance formula worked out step by step. |
+| **And OKLCH?** | How OKLCH is calculated, a live check against the OKLCH row, and why designers are moving to it. |
 | **Can you read it?** | A WCAG contrast checker. White text on HSL yellow: 1.07 : 1. On HSL blue: 8.59 : 1. Same lightness. |
 | **Not everyone sees the same colours** | Repaints the whole page as someone with protanopia, deuteranopia, tritanopia or no colour vision would see it. |
 
@@ -41,9 +42,16 @@ L = 0.2126 × R + 0.7152 × G + 0.0722 × B
 | `hsl(60 100% 50%)` yellow | 1 | 1 | 0 | 50% | 0.2126 + 0.7152 = **0.93** |
 | `hsl(240 100% 50%)` blue | 0 | 0 | 1 | 50% | **0.07** |
 
-**OKLCH** is a colour space designed so that the same `L` looks equally light
-for every hue. That's why its row of greys is flat, and why it's a better
-choice for palettes and design tokens.
+**OKLCH** is calculated differently: it undoes the gamma, turns the channels
+into the response of the eye's three kinds of cone, takes a cube root (the eye
+compresses light) and mixes them again into L, a and b. Its `L` is the
+lightness you perceive, so the same `L` looks equally light for every hue.
+That's why its row of greys is flat. For a grey it's exact: `L³` is its
+luminance, so `oklch(70% …)` sits around 0.7³ = 0.34.
+
+That predictable lightness is why teams are moving their palettes and design
+tokens to OKLCH, as Evil Martians explain in
+[OKLCH in CSS: why we moved from RGB and HSL](https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl).
 
 ## Run it locally
 
@@ -73,6 +81,7 @@ colour-blindness switch can repaint the whole page.
 - HSL → RGB: [CSS Color Module Level 4](https://www.w3.org/TR/css-color-4/#hsl-to-rgb)
 - Relative luminance and contrast ratio: [WCAG 2.2](https://www.w3.org/TR/WCAG22/#dfn-relative-luminance)
 - OKLCH → RGB: Björn Ottosson, [A perceptual color space for image processing](https://bottosson.github.io/posts/oklab/)
+- Why OKLCH in CSS: Andrey Sitnik and Travis Turner, [OKLCH in CSS: why we moved from RGB and HSL](https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl) (Evil Martians)
 - Colour blindness: Machado, Oliveira & Fernandes (2009), *A Physiologically-based Model for Simulation of Color Vision Deficiency*
 
 Made as the final project for Programming Interactivity.

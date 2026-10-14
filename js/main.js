@@ -108,11 +108,15 @@ function swatch(model, hue) {
   return li;
 }
 
+// The darkest and the brightest light in a row
+function lightRange(model) {
+  const lights = HUES.map((hue) => luminance(colourOf(model, hue)));
+  return { min: Math.min(...lights), max: Math.max(...lights) };
+}
+
 // "Light from 0.07 to 0.93": how far apart the brightest and darkest are
 function spread(model) {
-  const lights = HUES.map((hue) => luminance(colourOf(model, hue)));
-  const min = Math.min(...lights);
-  const max = Math.max(...lights);
+  const { min, max } = lightRange(model);
   return `Light from ${min.toFixed(2)} to ${max.toFixed(2)}: the brightest is ${(max / min).toFixed(1)}× the darkest.`;
 }
 
@@ -161,6 +165,15 @@ function drawHood() {
     + `${Math.round(total * 100)}% of the light of white.`;
 }
 
+// Step 3 undone: for a grey, OKLCH's L is exactly the cube root of its luminance,
+// so L³ gives the light back. The colours in the OKLCH row land close to it.
+function drawOklch() {
+  const l = state.okL / 100;
+  const { min, max } = lightRange("oklch");
+  $("#ok-check").textContent = `Check it with the OKLCH row above: L is ${state.okL}%, and ${l.toFixed(2)}³ = ${(l ** 3).toFixed(2)}. `
+    + `The light of its colours goes from ${min.toFixed(2)} to ${max.toFixed(2)}.`;
+}
+
 function drawContrast() {
   const ratio = contrast(hexToRgb(state.text), hexToRgb(state.bg));
 
@@ -183,6 +196,7 @@ function render() {
   drawGame();
   drawRows();
   drawHood();
+  drawOklch();
   drawContrast();
 }
 

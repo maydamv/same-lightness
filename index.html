@@ -80,6 +80,29 @@
       <p id="hood-result"></p>
     </section>
 
+    <section id="oklch">
+      <h2>And OKLCH?</h2>
+      <p>OKLCH is calculated in a different way: it starts from a model of the eye, so its L is the lightness you perceive.</p>
+
+      <ol class="steps">
+        <li>Undo the screen's gamma curve, like luminance does.</li>
+        <li>Turn red, green and blue into the response of the eye's three kinds of cone, with a 3×3 matrix.</li>
+        <li>Take the cube root of each one. The eye compresses light: twice the light doesn't look twice as light.</li>
+        <li>Mix them again into L, a and b. L is the perceived lightness; chroma and hue are a and b written as a distance and an angle.</li>
+      </ol>
+
+      <p class="check" id="ok-check"></p>
+
+      <h3>Why designers are moving to it</h3>
+      <ul class="reasons">
+        <li>The same L looks equally light in every hue, so you can change a colour's hue without breaking its contrast.</li>
+        <li>Making a colour 10% lighter gives the same result on every hue. In HSL, blue and purple react differently.</li>
+        <li>It can describe the extra P3 colours of modern screens, which <code>rgb()</code>, hex and <code>hsl()</code> can't.</li>
+        <li>You can read it: <code>oklch(70% 0.12 240)</code> is a medium-light, soft blue.</li>
+      </ul>
+      <p class="hint">From Evil Martians, <a href="https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl">OKLCH in CSS: why we moved from RGB and HSL</a>.</p>
+    </section>
+
     <section id="contrast">
       <h2>Can you read it?</h2>
       <p>Text needs enough difference in light from its background. WCAG measures it with the same luminance: contrast = (lighter + 0.05) / (darker + 0.05).</p>
