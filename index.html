@@ -29,14 +29,19 @@
 
     <div class="verdict">
       <p id="verdict" aria-live="polite">Both have the same lightness in HSL: 50%. Trust your eyes and click one.</p>
-      <button type="button" class="next" id="next" hidden>Next pair</button>
+      <div class="actions">
+        <button type="button" class="next" id="see-why" hidden>See why</button>
+        <button type="button" class="next" id="next" hidden>Next pair</button>
+      </div>
     </div>
-    <p class="round" id="round"></p>
+    <p class="round"><span id="round"></span> <button type="button" class="skip" id="skip">Skip the game</button></p>
   </header>
 
-  <main>
+  <p class="locked" id="locked">Finish the game to see the explanation.</p>
+
+  <main id="explanation" hidden>
     <section id="rows">
-      <h2>Same L, different light</h2>
+      <h2 tabindex="-1">Same L, different light</h2>
       <p>Every colour in a row has the same lightness number. The grey under each one is how much light it really sends to your eye.</p>
 
       <label class="link"><input type="checkbox" id="link-sliders" checked> Move both sliders together</label>

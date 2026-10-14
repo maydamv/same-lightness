@@ -103,7 +103,34 @@ button { font: inherit; color: inherit; }
 }
 .next:hover { background: transparent; color: var(--ink); }
 
+.actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; }
+/* when "See why" is showing, "Play again" next to it is the quieter button */
+.next:not([hidden]) + .next { background: transparent; color: var(--ink); }
+.next:not([hidden]) + .next:hover { background: var(--ink); color: var(--booth); }
+
 .round { margin: 0; color: var(--muted); font-size: 0.95rem; }
+.skip {
+  margin-left: 0.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.skip:hover { color: var(--ink); }
+
+.locked {
+  max-width: 62rem;
+  margin: 0 auto 4rem;
+  padding: 2rem 1.25rem;
+  border-top: 2px solid var(--ink);
+  color: var(--muted);
+  text-align: center;
+}
+
+#rows h2:focus { outline: none; }
 
 /* ---------- the explanation ---------- */
 main {

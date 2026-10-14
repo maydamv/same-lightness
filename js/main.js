@@ -15,6 +15,7 @@ const PAIRS = [
 
 const state = {
   game: { round: 0, guess: null, score: 0 }, // guess: 0 or 1, the tile clicked
+  unlocked: false, // the explanation shows once the game is finished or skipped
   hslL: 60,  // HSL lightness, in %
   okL: 60,   // OKLCH lightness, in %
   linked: true, // the two sliders move together
@@ -66,7 +67,7 @@ function drawGame() {
 
   if (finished) {
     $("#question").textContent = `Your eyes saw ${score} of ${PAIRS.length} differences. HSL saw none.`;
-    $("#verdict").textContent = "Every pair had the same HSL lightness, 50%. Scroll down to see why.";
+    $("#verdict").textContent = "Every pair had the same HSL lightness, 50%.";
     $("#next").textContent = "Play again";
   } else if (guess === null) {
     $("#question").textContent = "Which one is lighter?";
@@ -78,7 +79,21 @@ function drawGame() {
     $("#next").textContent = round === PAIRS.length - 1 ? "See my score" : "Next pair";
   }
   $("#next").hidden = guess === null && !finished;
+  $("#see-why").hidden = !finished;
+  $("#skip").hidden = state.unlocked;
   $("#round").textContent = finished ? "" : `Pair ${round + 1} of ${PAIRS.length}`;
+
+  // the explanation waits for the game: finish it or skip it
+  $("#explanation").hidden = !state.unlocked;
+  $("#locked").hidden = state.unlocked;
+}
+
+// Show the explanation and take the reader to its first heading
+function openExplanation() {
+  state.unlocked = true;
+  render();
+  // focus scrolls to the heading, and keyboard and screen readers start reading there
+  $("#rows h2").focus();
 }
 
 // The OKLCH row's chroma: the most colourful one at which all 12 hues still fit
@@ -232,9 +247,13 @@ $("#next").addEventListener("click", () => {
   } else {
     game.round += 1;
     game.guess = null;
+    if (game.round === PAIRS.length) state.unlocked = true; // finished: the explanation is earned
   }
   render();
 });
+
+$("#see-why").addEventListener("click", openExplanation);
+$("#skip").addEventListener("click", openExplanation);
 
 // Both rows get the same lightness number while the sliders are linked
 function setLightness(model, value) {
