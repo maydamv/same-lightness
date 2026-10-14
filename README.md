@@ -21,7 +21,7 @@ more light** than blue.
 | **Can you read it?** | A WCAG contrast checker. White text on HSL yellow: 1.07 : 1. On HSL blue: 8.59 : 1. Same lightness. |
 | **Not everyone sees the same colours** | Repaints the whole page as someone with protanopia, deuteranopia, tritanopia or no colour vision would see it. |
 
-![The two rows: HSL greys jump from 0.07 to 0.93, OKLCH greys stay between 0.32 and 0.37](docs/rows.jpg)
+![Both sliders at 60%: HSL greys jump from 0.10 to 0.93, OKLCH greys stay between 0.20 and 0.23](docs/rows.jpg)
 
 ## Why it happens
 

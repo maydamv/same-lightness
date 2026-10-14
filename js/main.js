@@ -1,8 +1,7 @@
-import { hslToRgb, oklchToRgb, luminance, asGrey, rgbToHex, toLinear, WEIGHTS, contrast, hexToRgb, simulate } from "./colour.js";
+import { hslToRgb, oklchToRgb, inGamut, luminance, asGrey, rgbToHex, toLinear, WEIGHTS, contrast, hexToRgb, simulate } from "./colour.js";
 
 // 12 hues around the colour wheel, one every 30°
 const HUES = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
-const OK_CHROMA = 0.12; // low enough that every hue fits on a screen
 
 // The game: pairs of hues, all hsl(h 100% 50%). They get harder as the
 // difference in light gets smaller.
@@ -16,8 +15,9 @@ const PAIRS = [
 
 const state = {
   game: { round: 0, guess: null, score: 0 }, // guess: 0 or 1, the tile clicked
-  hslL: 50,  // HSL lightness, in %
-  okL: 70,   // OKLCH lightness, in %
+  hslL: 60,  // HSL lightness, in %
+  okL: 60,   // OKLCH lightness, in %
+  linked: true, // the two sliders move together
   picked: { model: "hsl", hue: 240 }, // the colour shown in "Under the hood"
   text: "#ffffff", // the contrast checker
   bg: "#ffff00",
@@ -81,10 +81,19 @@ function drawGame() {
   $("#round").textContent = finished ? "" : `Pair ${round + 1} of ${PAIRS.length}`;
 }
 
+// The OKLCH row's chroma: the most colourful one at which all 12 hues still fit
+// on a screen. Lowering the chroma keeps every hue as it is; clamping wouldn't.
+function rowChroma() {
+  const l = state.okL / 100;
+  let c = 0.15;
+  while (!HUES.every((hue) => inGamut(l, c, hue))) c -= 0.005;
+  return Number(c.toFixed(3));
+}
+
 // The colour of one swatch, from the row it's in and its hue
 function colourOf(model, hue) {
   if (model === "hsl") return hslToRgb(hue, 1, state.hslL / 100);
-  return oklchToRgb(state.okL / 100, OK_CHROMA, hue);
+  return oklchToRgb(state.okL / 100, rowChroma(), hue);
 }
 
 function swatch(model, hue) {
@@ -121,8 +130,13 @@ function spread(model) {
 }
 
 function drawRows() {
+  // when the sliders are linked, moving one moves the other: draw both from state
+  $("#hsl-l").value = state.hslL;
+  $("#ok-l").value = state.okL;
+  $("#link-sliders").checked = state.linked;
   $("#hsl-l-value").textContent = `${state.hslL}%`;
   $("#ok-l-value").textContent = `${state.okL}%`;
+  $("#ok-c-value").textContent = rowChroma();
   $("#hsl-row").replaceChildren(...HUES.map((hue) => swatch("hsl", hue)));
   $("#ok-row").replaceChildren(...HUES.map((hue) => swatch("oklch", hue)));
   $("#hsl-spread").textContent = spread("hsl");
@@ -139,7 +153,7 @@ function drawHood() {
   $("#hood-chip").style.background = paint(rgb);
   $("#hood-name").textContent = model === "hsl"
     ? `hsl(${hue} 100% ${state.hslL}%) = ${rgbToHex(rgb)}`
-    : `oklch(${state.okL}% ${OK_CHROMA} ${hue}) = ${rgbToHex(rgb)}`;
+    : `oklch(${state.okL}% ${rowChroma()} ${hue}) = ${rgbToHex(rgb)}`;
 
   const steps = [
     ["Screen value, 0–255", rgb.map((c) => Math.round(c * 255))],
@@ -222,13 +236,19 @@ $("#next").addEventListener("click", () => {
   render();
 });
 
-$("#hsl-l").addEventListener("input", (event) => {
-  state.hslL = Number(event.target.value);
+// Both rows get the same lightness number while the sliders are linked
+function setLightness(model, value) {
+  if (model === "hsl" || state.linked) state.hslL = value;
+  if (model === "oklch" || state.linked) state.okL = value;
   render();
-});
+}
 
-$("#ok-l").addEventListener("input", (event) => {
-  state.okL = Number(event.target.value);
+$("#hsl-l").addEventListener("input", (event) => setLightness("hsl", Number(event.target.value)));
+$("#ok-l").addEventListener("input", (event) => setLightness("oklch", Number(event.target.value)));
+
+$("#link-sliders").addEventListener("change", (event) => {
+  state.linked = event.target.checked;
+  if (state.linked) state.okL = state.hslL; // linking again: OKLCH catches up with HSL
   render();
 });
 

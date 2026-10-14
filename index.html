@@ -39,21 +39,23 @@
       <h2>Same L, different light</h2>
       <p>Every colour in a row has the same lightness number. The grey under each one is how much light it really sends to your eye.</p>
 
+      <label class="link"><input type="checkbox" id="link-sliders" checked> Move both sliders together</label>
+
       <div class="row-head">
         <label for="hsl-l">HSL <code>hsl(h 100% <output id="hsl-l-value"></output>)</code></label>
-        <input id="hsl-l" type="range" min="10" max="90" value="50">
+        <input id="hsl-l" type="range" min="25" max="90" value="60">
       </div>
       <ul class="swatches" id="hsl-row"></ul>
       <p class="spread" id="hsl-spread"></p>
 
       <div class="row-head">
-        <label for="ok-l">OKLCH <code>oklch(<output id="ok-l-value"></output> 0.12 h)</code></label>
-        <input id="ok-l" type="range" min="40" max="90" value="70">
+        <label for="ok-l">OKLCH <code>oklch(<output id="ok-l-value"></output> <output id="ok-c-value"></output> h)</code></label>
+        <input id="ok-l" type="range" min="25" max="90" value="60">
       </div>
       <ul class="swatches" id="ok-row"></ul>
       <p class="spread" id="ok-spread"></p>
 
-      <p class="hint">Click a colour to see its maths below.</p>
+      <p class="hint">The chroma changes with the lightness: it's the most colourful one at which all 12 hues still fit on a screen. Click a colour to see its maths below.</p>
     </section>
 
     <section id="hood">
