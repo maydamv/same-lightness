@@ -61,6 +61,22 @@
 
     <section id="contrast">
       <h2>3 · Can you read it?</h2>
+      <p>Text needs enough difference in light from its background. WCAG measures it with the same luminance: contrast = (lighter + 0.05) / (darker + 0.05).</p>
+
+      <div class="pickers">
+        <label>Text <input type="color" id="text-colour" value="#ffffff"></label>
+        <label>Background <input type="color" id="bg-colour" value="#ffff00"></label>
+        <button type="button" class="preset" data-text="#ffffff" data-bg="#ffff00">White on hsl(60 100% 50%)</button>
+        <button type="button" class="preset" data-text="#ffffff" data-bg="#0000ff">White on hsl(240 100% 50%)</button>
+      </div>
+
+      <div class="preview" id="preview">
+        <p class="big">Harbour Night Market</p>
+        <p>Same HSL lightness, very different contrast.</p>
+      </div>
+
+      <p class="ratio"><strong id="ratio"></strong></p>
+      <ul class="checks" id="checks"></ul>
     </section>
 
     <section id="vision">

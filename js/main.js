@@ -1,4 +1,4 @@
-import { hslToRgb, oklchToRgb, luminance, asGrey, rgbToHex, toLinear, WEIGHTS } from "./colour.js";
+import { hslToRgb, oklchToRgb, luminance, asGrey, rgbToHex, toLinear, WEIGHTS, contrast, hexToRgb } from "./colour.js";
 
 // 12 hues around the colour wheel, one every 30°
 const HUES = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
@@ -8,7 +8,16 @@ const state = {
   hslL: 50,  // HSL lightness, in %
   okL: 70,   // OKLCH lightness, in %
   picked: { model: "hsl", hue: 240 }, // the colour shown in "Under the hood"
+  text: "#ffffff", // the contrast checker
+  bg: "#ffff00",
 };
+
+// WCAG's minimum ratios
+const LEVELS = [
+  { name: "AA, large text", min: 3 },
+  { name: "AA, normal text", min: 4.5 },
+  { name: "AAA, normal text", min: 7 },
+];
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -92,9 +101,28 @@ function drawHood() {
     + `${Math.round(total * 100)}% of the light of white.`;
 }
 
+function drawContrast() {
+  const ratio = contrast(hexToRgb(state.text), hexToRgb(state.bg));
+
+  $("#text-colour").value = state.text;
+  $("#bg-colour").value = state.bg;
+  $("#preview").style.color = state.text;
+  $("#preview").style.background = state.bg;
+  $("#ratio").textContent = `${ratio.toFixed(2)} : 1`;
+
+  $("#checks").replaceChildren(...LEVELS.map((level) => {
+    const li = document.createElement("li");
+    const pass = ratio >= level.min;
+    li.className = pass ? "pass" : "fail";
+    li.textContent = `${pass ? "✓" : "✗"} ${level.name} (${level.min} : 1)`;
+    return li;
+  }));
+}
+
 function render() {
   drawRows();
   drawHood();
+  drawContrast();
 }
 
 $("#hsl-l").addEventListener("input", (event) => {
@@ -106,5 +134,23 @@ $("#ok-l").addEventListener("input", (event) => {
   state.okL = Number(event.target.value);
   render();
 });
+
+$("#text-colour").addEventListener("input", (event) => {
+  state.text = event.target.value;
+  render();
+});
+
+$("#bg-colour").addEventListener("input", (event) => {
+  state.bg = event.target.value;
+  render();
+});
+
+for (const button of document.querySelectorAll(".preset")) {
+  button.addEventListener("click", () => {
+    state.text = button.dataset.text;
+    state.bg = button.dataset.bg;
+    render();
+  });
+}
 
 render();

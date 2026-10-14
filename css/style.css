@@ -98,3 +98,27 @@ code { font: 0.9em ui-monospace, Consolas, monospace; }
 .stack .r { background: #e5484d; }
 .stack .g { background: #30a46c; }
 .stack .b { background: #3e63dd; }
+
+/* ---------- 3 · contrast ---------- */
+.pickers { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1rem; margin: 1rem 0; }
+.pickers label { display: flex; align-items: center; gap: 0.4rem; font-weight: 700; }
+.pickers input { width: 3rem; height: 2.2rem; padding: 0; border: 1px solid var(--line); border-radius: 6px; background: none; }
+.preset {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  background: var(--bg);
+  cursor: pointer;
+}
+
+.preview { border-radius: 10px; padding: 1rem 1.25rem; border: 1px solid var(--line); }
+.preview p { margin: 0.25rem 0; }
+.preview .big { font-size: 1.8rem; font-weight: 800; }
+
+.ratio { font-size: 2rem; margin: 0.75rem 0 0.25rem; }
+.checks { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.checks li { padding: 0.25rem 0.7rem; border-radius: 99px; font-size: 0.9rem; font-weight: 600; }
+.checks .pass { background: #d9f2e3; color: #18603a; }
+.checks .fail { background: #fbe1df; color: #9b2c22; }
