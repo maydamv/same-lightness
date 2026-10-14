@@ -46,10 +46,11 @@ export function contrast(a, b) {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-// OKLCH → sRGB. l from 0 to 1, c is the chroma (0 is grey), h in degrees.
+// OKLCH → linear sRGB. l from 0 to 1, c is the chroma (0 is grey), h in degrees.
 // OKLCH was built so that the same l looks equally light for every hue.
 // Matrices from Björn Ottosson, who designed OKLab: https://bottosson.github.io/posts/oklab/
-export function oklchToRgb(l, c, h) {
+// Nothing is clamped here, so a channel can come out below 0 or above 1.
+function oklchToLinear(l, c, h) {
   const a = c * Math.cos((h * Math.PI) / 180);
   const b = c * Math.sin((h * Math.PI) / 180);
 
@@ -63,8 +64,18 @@ export function oklchToRgb(l, c, h) {
   const g = -1.2684380046 * long + 2.6097574011 * medium - 0.3413193965 * short;
   const bl = -0.0041960863 * long - 0.7034186147 * medium + 1.707614701 * short;
 
-  // some OKLCH colours don't exist on a screen: clamp them to the nearest one
-  return [r, g, bl].map((v) => clamp(fromLinear(v)));
+  return [r, g, bl];
+}
+
+// Can a screen show this colour? Every OKLCH colour exists for the eye, but an
+// sRGB screen only shows the ones whose three channels fall between 0 and 1.
+export function inGamut(l, c, h) {
+  return oklchToLinear(l, c, h).every((v) => v >= -0.0001 && v <= 1.0001);
+}
+
+// OKLCH → sRGB. Check inGamut() first: clamping a colour that doesn't fit can shift its hue.
+export function oklchToRgb(l, c, h) {
+  return oklchToLinear(l, c, h).map((v) => clamp(fromLinear(v)));
 }
 
 // How a colour looks to someone with a missing kind of cone.
