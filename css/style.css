@@ -35,3 +35,44 @@ section {
 
 h2 { margin: 0 0 0.5rem; font-size: 1.4rem; }
 p { max-width: 65ch; }
+code { font: 0.9em ui-monospace, Consolas, monospace; }
+.hint, .spread { color: var(--muted); font-size: 0.9rem; }
+
+/* ---------- 1 · the two rows ---------- */
+.row-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-top: 1.25rem;
+}
+.row-head label { font-weight: 700; }
+.row-head input { flex: 1; min-width: 10rem; }
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 4px;
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+}
+.swatches button {
+  display: grid;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+.swatches .colour, .swatches .grey { height: 3.5rem; }
+.swatches .colour { border-radius: 6px 6px 0 0; }
+.swatches .grey { border-radius: 0 0 6px 6px; }
+.swatches small { font: 0.75rem ui-monospace, Consolas, monospace; color: var(--muted); padding-top: 2px; }
+.swatches button[aria-pressed="true"] { outline: 3px solid var(--ink); outline-offset: 2px; border-radius: 6px; }
+.swatches button:focus-visible { outline: 3px solid #2f6fde; outline-offset: 2px; border-radius: 6px; }
+
+@media (max-width: 40rem) {
+  .swatches { grid-template-columns: repeat(6, 1fr); }
+}
