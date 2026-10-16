@@ -15,6 +15,7 @@
 <body>
   <header class="game">
     <h1 id="question">Which one is lighter?</h1>
+    <p class="note">Both are hsl(… 100% 50%): for CSS they're equally light. Ask the room which looks lighter, then click it. The grey is the real light: yellow 0.93, blue 0.07, almost 13 times more.</p>
 
     <div class="tiles">
       <button type="button" class="tile" id="tile-a">
@@ -42,6 +43,7 @@
   <main id="explanation" hidden>
     <section id="rows">
       <h2 tabindex="-1">Same L, different light</h2>
+      <p class="note">Same lightness number in both rows. Each grey is the colour in black and white. HSL greys jump from almost white to almost black; OKLCH greys stay flat. Move the slider: it holds at any lightness.</p>
       <p>Every colour in a row has the same lightness number. The grey under each one is how much light it really sends to your eye.</p>
 
       <label class="link"><input type="checkbox" id="link-sliders" checked> Move both sliders together</label>
@@ -65,6 +67,7 @@
 
     <section id="hood">
       <h2>Under the hood</h2>
+      <p class="note">A pixel is three lights. HSL lightness is (strongest + weakest) / 2, so every pure colour is 50%. Our eyes weigh them: green 72%, red 21%, blue 7%. I undo the screen's gamma, multiply by the weights and add: yellow is 0.21 + 0.72 = 0.93.</p>
       <p>HSL's lightness is only the middle point between the strongest and the weakest channel. It doesn't know that our eyes are much more sensitive to green than to blue. Relative luminance does.</p>
 
       <div class="picked">
@@ -89,6 +92,7 @@
 
     <section id="match">
       <h2>Match the grey</h2>
+      <p class="note">Invite someone to play the blue round. Most people stop around 50–55%. For the same grey, blue needs L 70% and yellow only 25%.</p>
       <p>Your turn. Move the slider until the colour sends as much light as the grey. The slider is HSL lightness, so don't trust the number: trust your eyes.</p>
 
       <div class="match" id="match-box">
@@ -125,6 +129,7 @@
 
     <section id="oklch">
       <h2>And OKLCH?</h2>
+      <p class="note">OKLCH models the eye: three cones, then a cube root, because the eye compresses light. Check: at L 60%, 0.6³ ≈ 0.22, right where the OKLCH greys are. Evil Martians: you can change the hue without breaking contrast. Out-of-screen colours: I lower the chroma instead of clipping.</p>
       <p>OKLCH is calculated in a different way: it starts from a model of the eye, so its L is the lightness you perceive.</p>
 
       <ol class="steps">
@@ -148,6 +153,7 @@
 
     <section id="contrast">
       <h2>Can you read it?</h2>
+      <p class="note">Click both buttons. Same HSL lightness, white text: 1.07 on yellow, 8.59 on blue. Pick colours by HSL and you can ship text nobody can read.</p>
       <p>Text needs enough difference in light from its background. WCAG measures it with the same luminance: contrast = (lighter + 0.05) / (darker + 0.05).</p>
 
       <div class="pickers">
@@ -168,6 +174,7 @@
 
     <section id="vision">
       <h2>Not everyone sees the same colours</h2>
+      <p class="note">Pick deuteranopia and scroll up: red, orange and green become the same mustard, only light tells them apart. Every colour goes through one function, paint(), so one switch repaints the whole page.</p>
       <p>About 1 in 12 men and 1 in 200 women see colours differently. Pick a type: every colour on this page changes to how they would see it. The luminance numbers don't change, because the light is the same; only the hue gets lost.</p>
 
       <fieldset class="visions">
@@ -184,6 +191,7 @@
   </main>
 
   <footer>
+    <p class="note">Closing: HSL measures the numbers, not the light. Use OKLCH for palettes and check contrast with luminance. Thank you!</p>
     <p>A final project for Programming Interactivity. <a href="https://github.com/maydamv/same-lightness">The code is on GitHub</a>.</p>
   </footer>
 </body>

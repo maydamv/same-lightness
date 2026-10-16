@@ -316,6 +316,21 @@ footer {
   color: var(--muted);
 }
 
+/* speaker notes: hidden unless the page is opened with #notes */
+.note { display: none; }
+.presenting .note {
+  display: block;
+  max-width: 62ch;
+  margin: 0.5rem 0 1.25rem;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--ink);
+  background: var(--chip);
+  font-size: 1rem;
+  text-align: left;
+}
+.presenting .note::before { content: "Say: "; font-weight: 700; }
+.game .note { justify-self: center; }
+
 @media (prefers-reduced-motion: reduce) {
   .tile, .tile .truth, .swatches button, .card-chip .truth { transition: none; }
 }
