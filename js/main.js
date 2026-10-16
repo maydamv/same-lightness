@@ -339,13 +339,6 @@ $("#match-next").addEventListener("click", () => {
   render();
 });
 
-// Presenter mode: open the page with #notes at the end of the URL to see the speaker notes
-function showNotes() {
-  document.body.classList.toggle("presenting", location.hash === "#notes");
-}
-window.addEventListener("hashchange", showNotes);
-showNotes();
-
 $("#see-why").addEventListener("click", openExplanation);
 $("#skip").addEventListener("click", openExplanation);
 

@@ -316,20 +316,23 @@ footer {
   color: var(--muted);
 }
 
-/* speaker notes: hidden unless the page is opened with #notes */
-.note { display: none; }
-.presenting .note {
-  display: block;
+/* "In short": the one thing to remember from each part, printed like the label of a swatch */
+.in-short {
+  display: grid;
+  gap: 0.2rem;
   max-width: 62ch;
-  margin: 0.5rem 0 1.25rem;
-  padding: 0.75rem 1rem;
-  border-left: 4px solid var(--ink);
+  margin: 0.25rem 0 1.5rem;
+  padding: 0.9rem 1.1rem;
+  border-left: 6px solid var(--ink);
+  border-radius: 0 3px 3px 0;
   background: var(--chip);
-  font-size: 1rem;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+  font-size: 1.05rem;
   text-align: left;
 }
-.presenting .note::before { content: "Say: "; font-weight: 700; }
-.game .note { justify-self: center; }
+.in-short b { font-family: var(--display); font-stretch: 125%; font-weight: 800; font-size: 0.85rem; }
+.game .in-short { justify-self: center; margin: 0; }
+.closing { margin: 0 0 1.5rem; }
 
 @media (prefers-reduced-motion: reduce) {
   .tile, .tile .truth, .swatches button, .card-chip .truth { transition: none; }
